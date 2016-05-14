@@ -31,8 +31,8 @@ class uart_gps:
     # Refer to SIM28 NMEA spec file http://www.seeedstudio.com/wiki/images/a/a0/SIM28_DATA_File.zip
 
     def __init__(self):
-        raw=[] #raw input string
-        parsed_input=[] #parsed input
+        self.raw=[] #raw input string
+        self.read() #set up values
 
     #Read data from the GPS
     def read(self):
@@ -45,17 +45,27 @@ class uart_gps:
             self.raw = self.raw[ind:]
         except ValueError:
             pass
-        self.parsed_input=self.raw.split(",") #Split the stream into individual parts
+
+        parsed_input=self.raw.split(",") #Split the stream into individual parts
+        self.time=parsed_input[1] #UTC time
+        self.lat=parsed_input[2]
+        self.lat_ns=parsed_input[3]
+        self.lon=parsed_input[4]
+        self.lon_ew=parsed_input[5]
+        self.fix=parsed_input[6]
+        self.sats=parsed_input[7]
+        self.altitude=parsed_input[9]
         return self.current_values()
 
     #Split the data into individual elements
     def current_values(self):
-        time=self.parsed_input[1] #UTC time
-        lat=self.parsed_input[2]
-        lat_ns=self.parsed_input[3]
-        lon=self.parsed_input[4]
-        lon_ew=self.parsed_input[5]
-        fix=self.parsed_input[6]
-        sats=self.parsed_input[7]
-        alt=self.parsed_input[9]
-        return [time,fix,sats,alt,lat,lat_ns,lon,lon_ew]
+        data = {}
+        data['time'] = self.time
+        data['lat'] = self.lat
+        data['lat_ns'] = self.lat_ns
+        data['lon'] = self.lon
+        data['lon_ew'] = self.lon_ew
+        data['fix'] = self.fix
+        data['sats'] = self.sats
+        data['altitude'] = self.altitude
+        return data
