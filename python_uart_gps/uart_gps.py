@@ -28,10 +28,11 @@ class uart_gps:
     # The GPS module used is a Grove GPS module http://www.seeedstudio.com/depot/Grove-GPS-p-959.html
     # Refer to SIM28 NMEA spec file http://www.seeedstudio.com/wiki/images/a/a0/SIM28_DATA_File.zip
 
-    def __init__(self, port="/dev/ttyO2", baudrate=9600):
+    def __init__(self, port="/dev/ttyO2", baudrate=9600, timeout=1):
         self.port = port
         self.baud = baudrate
-        self.sensor = serial.Serial(port, baudrate)
+        self.timeout = timeout
+        self.sensor = serial.Serial(port, baudrate, timeout)
         self.sensor.flush()
         self.read() #set up values
 
@@ -39,23 +40,23 @@ class uart_gps:
     def read(self):
         while True:
             raw = self.sensor.readline()
-            if raw[:6] =='$GPGGA': # parsed_input data , packet 1, has all the data we need
+            if raw[:6] =='$GPGGA': # this is the packet we are looking for
                 break
         try:
-            index = raw.index('$GPGGA',5,len(raw)) #Sometimes multiple GPS data packets come into the stream. Take the data only after the last '$GPGGA' is seen
+            index = raw.index('$GPGGA',5,len(raw)) # Take data after the last '$GPGGA'
             raw = raw[ind:]
         except ValueError:
             pass
 
-        parsed_input=raw.split(",") #Split the stream into individual parts
-        self.time=parsed_input[1] #UTC time
-        self.lat=parsed_input[2]
-        self.lat_ns=parsed_input[3]
-        self.lon=parsed_input[4]
-        self.lon_ew=parsed_input[5]
-        self.fix=parsed_input[6]
-        self.sats=parsed_input[7]
-        self.altitude=parsed_input[9]
+        parsed_input = raw.split(",") #Split the stream into individual parts
+        self.time = parsed_input[1] #UTC time
+        self.lat = parsed_input[2]
+        self.lat_ns = parsed_input[3]
+        self.lon = parsed_input[4]
+        self.lon_ew = parsed_input[5]
+        self.fix = parsed_input[6]
+        self.sats = parsed_input[7]
+        self.altitude = parsed_input[9]
         return self.current_values()
 
     #Split the data into individual elements
