@@ -23,30 +23,31 @@ import time
 import sys
 import serial
 
-ser = serial.Serial(port = "/dev/ttyO2", baudrate=9600)
-ser.flush()
 
 class uart_gps:
     # The GPS module used is a Grove GPS module http://www.seeedstudio.com/depot/Grove-GPS-p-959.html
     # Refer to SIM28 NMEA spec file http://www.seeedstudio.com/wiki/images/a/a0/SIM28_DATA_File.zip
 
-    def __init__(self):
-        self.raw=[] #raw input string
+    def __init__(self, port="/dev/ttyO2", baudrate=9600):
+        self.port = port
+        self.baud = baudrate
+        self.sensor = serial.Serial(port, baudrate)
+        self.sensor.flush()
         self.read() #set up values
 
     #Read data from the GPS
     def read(self):
         while True:
-            self.raw = ser.readline()
-            if self.raw[:6] =='$GPGGA': # parsed_input data , packet 1, has all the data we need
+            raw = self.sensor.readline()
+            if raw[:6] =='$GPGGA': # parsed_input data , packet 1, has all the data we need
                 break
         try:
-            index = self.raw.index('$GPGGA',5,len(self.raw)) #Sometimes multiple GPS data packets come into the stream. Take the data only after the last '$GPGGA' is seen
-            self.raw = self.raw[ind:]
+            index = raw.index('$GPGGA',5,len(raw)) #Sometimes multiple GPS data packets come into the stream. Take the data only after the last '$GPGGA' is seen
+            raw = raw[ind:]
         except ValueError:
             pass
 
-        parsed_input=self.raw.split(",") #Split the stream into individual parts
+        parsed_input=raw.split(",") #Split the stream into individual parts
         self.time=parsed_input[1] #UTC time
         self.lat=parsed_input[2]
         self.lat_ns=parsed_input[3]
