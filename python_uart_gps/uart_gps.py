@@ -32,16 +32,21 @@ class uart_gps:
         self.port = port
         self.baud = baudrate
         self.timeout = timeout
-        self.sensor = serial.Serial(port, baudrate, timeout)
+        self.sensor = serial.Serial(port, baudrate, timeout=timeout)
         self.sensor.flush()
         self.read() #set up values
 
     #Read data from the GPS
     def read(self):
+        count = 0
         while True:
             raw = self.sensor.readline()
             if raw[:6] =='$GPGGA': # this is the packet we are looking for
                 break
+            elif raw == '':
+                count = count+1
+                if count == 10: # nothing has been received for ten timeouts
+                    raise IOError('No data received. Check sensor connection')
         try:
             index = raw.index('$GPGGA',5,len(raw)) # Take data after the last '$GPGGA'
             raw = raw[ind:]
