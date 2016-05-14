@@ -19,12 +19,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import Adafruit_BBIO.UART as UART
 import time
 import sys
 import serial
 
-UART.setup("UART2")
 ser = serial.Serial(port = "/dev/ttyO2", baudrate=9600)
 ser.flush()
 
