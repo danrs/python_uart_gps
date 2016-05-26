@@ -7,7 +7,7 @@ As a more fully featured alternative to this library, look into gpsd and python-
 
 To install, execute the following commands:
 ```
-git clone https://github.com/danrs/python_uart_gps # or download as a zip and extract it somewhere handy
+git clone https://github.com/modular-CAT/python_uart_gps # or download as a zip and extract it somewhere handy
 cd python_uart_gps
 sudo python setup.py install
 ```
